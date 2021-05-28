@@ -1,0 +1,7 @@
+{
+  "name": "module-system",
+  "version": "1.0.0",
+  "main": "loadModule.js",
+  "license": "MIT",
+  "type": "commonjs"
+}

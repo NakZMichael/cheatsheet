@@ -1,0 +1,1 @@
+Common JSのrequireを要約したもの

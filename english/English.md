@@ -28,3 +28,4 @@
 - preclude: 邪魔をする
 - plural: 複数形
 - brevity: 簡潔さ
+- incognito window:シークレットウィンドウ

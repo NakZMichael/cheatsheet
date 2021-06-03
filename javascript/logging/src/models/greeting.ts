@@ -10,6 +10,7 @@ export class Greeting{
   greeting(){
     this.logger.log();
   }
+  
   async lazyGreeting(){
     await sleep(1000);
     this.logger.log();

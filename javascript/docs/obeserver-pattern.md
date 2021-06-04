@@ -1,0 +1,3 @@
+# Observer patternの定義
+
+Subjectと呼ばれるオブジェクトがあり。Subjectの状態が変化したときに、ObserverあるいはListenerに通知が届く。

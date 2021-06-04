@@ -29,3 +29,17 @@
 - plural: 複数形
 - brevity: 簡潔さ
 - incognito window:シークレットウィンドウ
+- unleash: 紐を解く
+- ominous:不吉な
+- imperative:必須な
+- sparlingly:倹約して
+- deferred:延期された
+- pending:待機中の
+- starvation:飢餓
+- refrain from ~: ~を控える
+- eventual: 偶発的な
+- abluptly:いきなり
+- abort:(プログラムが)終了する
+- unforeseeable:予測できない
+- complement:補完
+- fledged:一人前の

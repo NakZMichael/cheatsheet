@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sample-deployment
+  template:
+    metadata:
+      labels:
+        app: sample-deployment
+    spec:
+      containers:
+      - name: nginx-container
+        image: amsy810/echo-nginx:v2.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

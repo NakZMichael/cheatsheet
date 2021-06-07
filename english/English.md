@@ -43,3 +43,8 @@
 - unforeseeable:予測できない
 - complement:補完
 - fledged:一人前の
+- novice:初心者
+- unwieldly:扱いにくい
+- in advance:事前に
+- accordingly:適切に、相応に
+- adequate:適切な

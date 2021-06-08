@@ -48,3 +48,5 @@
 - in advance:事前に
 - accordingly:適切に、相応に
 - adequate:適切な
+- evict: 退避させる
+- ephemeral:儚

@@ -312,7 +312,7 @@ export function generatePlottedDataForComparingSummuation(simulator:Simulator){
     timeStep:number,
     value:number
   }[] = []
-  for (let interval=1;interval<=1000;interval++){
+  for (let interval=1;interval<=500;interval++){
     const dataForOneTimeStep:{
       time:number,
       summuation:number,

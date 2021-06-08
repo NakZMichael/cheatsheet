@@ -1,6 +1,7 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-// import { differenceInMilliseconds } from 'date-fns';
+import Plot from 'react-plotly.js';
+import {Data} from 'plotly.js';
 import { generatePlottedDataForComparingInequality, generatePlottedDataForComparingSummuation, optimalSimulator, simpleSimulator, Simulator } from '../../physics';
 
 export const ChartsApp = ()=> {
@@ -58,7 +59,9 @@ export const ChartsApp = ()=> {
             dot={false} 
           />
         </LineChart>
-          </div>
+        <AltChart data={dataForCompareInequalityForSimple}/>
+        <AltChart data={dataForCompareInequalityForOptimal}/>
+    </div>
   );
 }
 
@@ -111,6 +114,34 @@ const Chart = (props:{
     <Legend />
     {lines}
   </LineChart>
+  )
+}
+
+const AltChart = (props:{data:PlottedData[]})=>{
+  const altPlottedData:Data[] = []
+  Object.keys(props.data[0]).forEach(key=>{
+    if(key==="time"){
+      return
+    }
+    const x:number[] = []
+    const y:number[] = []
+    props.data.forEach(value=>{
+      x.push(value.time)
+      y.push(value[key])
+    })
+    altPlottedData.push({
+      x:x,
+      y:y,
+      type:'scatter',
+      mode:'lines',
+      marker:{color:getRandomColor()}
+    })
+  })
+  return (
+    <Plot
+        data={altPlottedData}
+        layout={ {width: 700, height: 500, title: 'A Fancy Plot'} }
+      />
   )
 }
 

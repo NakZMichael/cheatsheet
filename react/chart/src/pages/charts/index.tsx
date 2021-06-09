@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'r
 import Plot from 'react-plotly.js';
 import {Data} from 'plotly.js';
 import { generatePlottedDataForComparingInequality, generatePlottedDataForComparingSummuation, optimalSimulator, simpleSimulator, Simulator } from '../../physics';
+import { getRandomColor } from './utils';
 
 export const ChartsApp = ()=> {
   const dataForExpectedValueSimple = generatePlottedDataForExpectedValue(simpleSimulator)
@@ -59,8 +60,8 @@ export const ChartsApp = ()=> {
             dot={false} 
           />
         </LineChart>
-        <AltChart data={dataForCompareInequalityForSimple}/>
-        <AltChart data={dataForCompareInequalityForOptimal}/>
+        <AltChart data={dataForCompareInequalityForSimple} title={'Example comparison'} yAxisTitle="Value" xAxisTitle="Time" />
+        <AltChart data={dataForCompareInequalityForOptimal} title={'Optimal comparision'} yAxisTitle="Value" xAxisTitle="Time" />
     </div>
   );
 }
@@ -117,7 +118,12 @@ const Chart = (props:{
   )
 }
 
-const AltChart = (props:{data:PlottedData[]})=>{
+const AltChart = (props:{
+  data:PlottedData[],
+  title:string,
+  yAxisTitle:string,
+  xAxisTitle:string
+})=>{
   const altPlottedData:Data[] = []
   Object.keys(props.data[0]).forEach(key=>{
     if(key==="time"){
@@ -134,13 +140,27 @@ const AltChart = (props:{data:PlottedData[]})=>{
       y:y,
       type:'scatter',
       mode:'lines',
-      marker:{color:getRandomColor()}
+      name:key,
+      marker:{color:getRandomColor()},
     })
   })
   return (
     <Plot
         data={altPlottedData}
-        layout={ {width: 700, height: 500, title: 'A Fancy Plot'} }
+        layout={ {
+          width: 700, 
+          height: 500, 
+          title: props.title,
+          yaxis:{
+            title:props.yAxisTitle,
+            exponentformat:"e"
+          },
+          xaxis:{
+            title:`${props.xAxisTitle} [s]`
+          }
+        }
+
+      }
       />
   )
 }
@@ -185,11 +205,3 @@ function generatePlottedDataForVariance(simulator:Simulator):PlottedData[]{
   return plottedDataForVariance
 }
 
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}

@@ -68,10 +68,10 @@ type SimulatorFunction = () => {
 
 const simpleKFunction:KFunction = (time:number)=>{
   // return 3 * 1.38064852 * Math.pow(10,-2)
-  return 3 * 1.38064852 * Math.pow(10,-21) + time * Math.pow(10,-5)
+  return 3 * 1.38064852 * Math.pow(10,-21) +  Math.pow(10,-5) * (1 + time)
 }
 const simplePotentialCenterFunction:PotentialCenterFunction = (time:number)=>{
-  return 10 * Math.sin(time)
+  return Math.pow(10,-8) * Math.sin(time)
 }
 
 
@@ -237,8 +237,8 @@ export const optimalSimulator = new Simulator({
   potentialCenterFunction : simplePotentialCenterFunction,
 })
 
-optimalSimulator.expectedValueChangeRateFunction = (props)=>1
-optimalSimulator.varianceChangeRateFunction = (props)=> Math.sqrt(props.currentVariance) * Math.pow(10,-10)
+optimalSimulator.expectedValueChangeRateFunction = (props)=>Math.pow(10,-10) *1.5
+optimalSimulator.varianceChangeRateFunction = (props)=> - Math.sqrt(props.currentVariance) *  Math.pow(10,-9)
 
 
 export function generatePlottedDataForComparingInequality(simulator:Simulator){

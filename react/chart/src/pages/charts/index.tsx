@@ -5,142 +5,114 @@ import {Data} from 'plotly.js';
 import { generatePlottedDataForComparingInequality, generatePlottedDataForComparingSummuation, optimalSimulator, simpleSimulator, Simulator } from '../../physics';
 
 export const ChartsApp = ()=> {
-  const dataForExpectedValueSimple = generatePlottedDataForExpectedValue(simpleSimulator)
-  const dataForExpectedValueOptimal = generatePlottedDataForExpectedValue(optimalSimulator)
+  // const dataForExpectedValueSimple = generatePlottedDataForExpectedValue(simpleSimulator)
+  // const dataForExpectedValueOptimal = generatePlottedDataForExpectedValue(optimalSimulator)
 
-  const dataForVarianceSimple = generatePlottedDataForVariance(simpleSimulator)
-  const dataForVarianceOptimal = generatePlottedDataForVariance(optimalSimulator)
+  // const dataForVarianceSimple = generatePlottedDataForVariance(simpleSimulator)
+  // const dataForVarianceOptimal = generatePlottedDataForVariance(optimalSimulator)
 
   const dataForCompareInequalityForSimple = generatePlottedDataForComparingInequality(simpleSimulator)
   const dataForCompareInequalityForOptimal = generatePlottedDataForComparingInequality(optimalSimulator)
   return (
     <div style={{padding:40}}>
-        {/* 期待値のプロット */}
-        <Chart data={dataForExpectedValueSimple} />
-        {/* 分散のプロット */}
-        <Chart data={dataForVarianceSimple} />
-        {/* 不等式の比較のプロット */}
-        <Chart data={dataForCompareInequalityForSimple} />
 
-
-        <Chart data={dataForExpectedValueOptimal} />
-        <Chart data={dataForVarianceOptimal} />
-        <Chart data={dataForCompareInequalityForOptimal} />
         {/* 総和のプロット */}
-        <LineChart
-          width={500}
-          height={500}
-          data={generatePlottedDataForComparingSummuation(simpleSimulator)}
-          margin={{
-            top: 10,
-            right: 20,
-            left: 20,
-            bottom: 10,
-          }}
-          >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            dataKey="timeStep" 
-            // tickFormatter={(value,index)=>{
-            //   return Math.round(value).toString()
-            // }}
-          />
-          <YAxis 
-          tickFormatter={(value:Number,index)=>{
-            return value.toPrecision(3)
-          }}
-          />
-          <Tooltip />
-          <Legend />
-          <Line 
-            type="monotone" 
-            dataKey={"value"} 
-            stroke={getRandomColor()}
-            dot={false} 
-          />
-        </LineChart>
-        <AltChart data={dataForCompareInequalityForSimple}/>
-        <AltChart data={dataForCompareInequalityForOptimal}/>
+        <SummationChart />
+        <Chart 
+          data={dataForCompareInequalityForSimple}
+          xAxisTitle={"Time"}
+          yAxisTitle={"Value"}
+          title={"Compare tightness of inequalities"}
+        />
+        <Chart 
+          data={dataForCompareInequalityForOptimal}
+          xAxisTitle={"Time"}
+          yAxisTitle={"Value"}
+          title={"Compare tightness of inequalities in the optimal protocol"}
+        />
     </div>
   );
 }
 
 const Chart = (props:{
   data:PlottedData[],
+  title:string,
+  xAxisTitle:string,
+  yAxisTitle:string,
 })=>{
-  const timeStep = props.data[1].time-props.data[0].time
-  const lineKeys:string[] = []
-  Object.keys(props.data[0]).forEach(value =>{
-    if(value !== 'time'){
-      lineKeys.push(value)
-    }
-  })
-  const lines =  lineKeys.map(value=>(
-    <Line 
-      type="monotone" 
-      dataKey={value} 
-      stroke={getRandomColor()}
-      dot={false} 
-      key={value}
-    />
-  ))
-
-  return (
-    <LineChart
-    width={500}
-    height={500}
-    data={props.data}
-    margin={{
-      top: 10,
-      right: 20,
-      left: 20,
-      bottom: 10,
-    }}
-    >
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis 
-      dataKey="time" 
-      interval={Math.round(1/timeStep)} 
-      tickFormatter={(value,index)=>{
-        return Math.round(value).toString()
-      }}
-    />
-    <YAxis 
-    tickFormatter={(value:Number,index)=>{
-      return value.toPrecision(3)
-    }}
-    />
-    <Tooltip />
-    <Legend />
-    {lines}
-  </LineChart>
-  )
-}
-
-const AltChart = (props:{data:PlottedData[]})=>{
-  const altPlottedData:Data[] = []
-  Object.keys(props.data[0]).forEach(key=>{
+  let altPlottedData:Data[] = []
+  Object.keys(props.data[0]).forEach( key=>{
     if(key==="time"){
+      return
+    }
+
+    if( key !== "entropyProduction" && key !== "lowerBoundByPathLength" && key !== "lowerBoundByDistance"){
       return
     }
     const x:number[] = []
     const y:number[] = []
-    props.data.forEach(value=>{
+    props.data.forEach((value,index)=>{
+      if(index % (key === "entropyProduction"?1:40) !== 0){
+        return
+      }
       x.push(value.time)
       y.push(value[key])
     })
     altPlottedData.push({
       x:x,
       y:y,
-      type:'scatter',
-      mode:'lines',
-      marker:{color:getRandomColor()}
+      type:"scatter",
+      mode:key === "entropyProduction"?"lines":"markers",
+      marker:{
+        color:key === "entropyProduction"?"#2e8b57":key ==="lowerBoundByPathLength"?"red":"#4682b4",
+        size:key ==="lowerBoundByPathLength"?8:12,
+        symbol:key ==="lowerBoundByPathLength"?"x-thin":"square-open",
+        line:{
+          width:key ==="lowerBoundByPathLength"?2:2,
+          color:"#daa520"
+        }
+      },
+      name:key === "entropyProduction"?"entropy production":key ==="lowerBoundByPathLength"?"lower bound measured by path length":"lower bound measured by wasserstein distance",
     })
   })
   return (
     <Plot
         data={altPlottedData}
-        layout={ {width: 700, height: 500, title: 'A Fancy Plot'} }
+        layout={ {
+          width: 900, 
+          height: 600, 
+          font:{
+            size:20,
+          },
+          title: props.title,
+          xaxis:{
+            title: props.xAxisTitle,
+          },
+          yaxis:{
+            title: props.yAxisTitle,
+          },
+          legend:{
+            x:0.01,
+            y:1,
+            font:{
+              size:20
+            },
+            // bgcolor:"transparent",
+            bordercolor:"#222",
+            borderwidth:1
+          }
+        } }
+        config = {{
+          toImageButtonOptions: {
+            format: 'png', // one of png, svg, jpeg, webp
+            filename: props.title,
+            // width: 1200,
+            // height: 500,
+            // scale: 15 // Multiply title/legend/axis/canvas sizes by this factor
+          },
+          
+        }}
+        
       />
   )
 }
@@ -149,47 +121,74 @@ const AltChart = (props:{data:PlottedData[]})=>{
  * プロット用のデータ
  */
 type PlottedData = {
-  time:number,
-  [value:string]:number
+  "time":number,
+  "entropyProduction":number,
+  "lowerBoundByPathLength": number,
+  "lowerBoundByDistance": number,
 }
-/**
- * 
- * @returns 分布の中心の期待値のプロット用のデータ
- */
-function generatePlottedDataForExpectedValue(simulator:Simulator):PlottedData[]{
 
-  const simulatedData = simulator.execute()
 
-  const plottedDataForExpectedValue:PlottedData[] = simulatedData.map(value=>{
-    return {
-      time:value.time,
-      expectedValue:value.observable.expectedValue
-    }
+const SummationChart = () => {
+  const rawData = generatePlottedDataForComparingSummuation(simpleSimulator)
+  const plottedData:Data[] = []
+  const actualValue = rawData[0].value
+  const x:number[] = []
+  const y:number[] = []
+  rawData.forEach((value,index)=>{
+    x.push(value.timeStep)
+    y.push(value.value/actualValue)
   })
-  return plottedDataForExpectedValue
-}
-/**
- * 
- * @returns 分布の分散ののプロット用のデータ
- */
-function generatePlottedDataForVariance(simulator:Simulator):PlottedData[]{
-
-  const simulatedData = simulator.execute()
-
-  const plottedDataForVariance:PlottedData[] = simulatedData.map(value=>{
-    return {
-      time:value.time,
-      variance:value.observable.variance
-    }
-  })
-  return plottedDataForVariance
-}
-
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+  plottedData.push({
+    x:x,
+    y:y,
+    type:"scatter",
+    mode:"lines",
+    marker:{
+      color:"#2e8b57",
+      line:{
+        width:2,
+        color:"#daa520"
+      }
+  },
+  name:"entropy production",
+})
+  return (
+    <Plot
+        data={plottedData}
+        layout={ {
+          width: 900, 
+          height: 600, 
+          font:{
+            size:20,
+          },
+          title: "Precisions of observation of the entropy production",
+          xaxis:{
+            title: 'Interval',
+          },
+          yaxis:{
+            title: 'Rate against actual entropy procuction',
+          },
+          legend:{
+            x:0.01,
+            y:1,
+            font:{
+              size:20
+            },
+            bordercolor:"#222",
+            borderwidth:1
+          }
+        } }
+        config = {{
+          toImageButtonOptions: {
+            format: 'png', // one of png, svg, jpeg, webp
+            filename: 'precision',
+            // width: 1200,
+            // height: 500,
+            // scale: 15 // Multiply title/legend/axis/canvas sizes by this factor
+          },
+          
+        }}
+        
+      />
+  )
 }

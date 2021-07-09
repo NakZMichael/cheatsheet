@@ -50,3 +50,5 @@
 - adequate:適切な
 - evict: 退避させる
 - ephemeral:儚
+- embody: 具象化させる
+- Now comes the best part.: ここからが本番です。

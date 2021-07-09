@@ -28,3 +28,11 @@ asyncOperation(arg, (err, result) => {
 ## Promiseの細かい仕様
 
 - `resolve`や`reject`をコンストラクタ中で何度か呼び出しても最初に呼び出された値のみがPromiseをfulufilmentかrejectionになる。
+
+## 起動コマンド
+
+具体例
+
+```
+yarn start  https://loige.co 2 4
+```

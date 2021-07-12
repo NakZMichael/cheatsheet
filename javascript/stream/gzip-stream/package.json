@@ -1,0 +1,23 @@
+{
+  "name": "gzip-stream",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
+    "@typescript-eslint/parser": "^4.28.2",
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "jest": "^27.0.6",
+    "ts-node": "^10.1.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.3.5"
+  },
+  "scripts": {
+    "test": "jest --coverage --verbose",
+    "build": "tsc",
+    "server": "ts-node ./src/gzip-receive.ts",
+    "client":"ts-node ./src/gzip-send.ts"
+  }
+}

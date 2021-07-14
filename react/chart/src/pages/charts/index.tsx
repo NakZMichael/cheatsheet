@@ -1,15 +1,9 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import Plot from 'react-plotly.js';
 import {Data} from 'plotly.js';
-import { generatePlottedDataForComparingInequality, generatePlottedDataForComparingSummuation, optimalSimulator, simpleSimulator, Simulator } from '../../physics';
+import { generatePlottedDataForComparingInequality, generatePlottedDataForComparingSummuation, optimalSimulator, simpleSimulator } from '../../physics';
 
 export const ChartsApp = ()=> {
-  // const dataForExpectedValueSimple = generatePlottedDataForExpectedValue(simpleSimulator)
-  // const dataForExpectedValueOptimal = generatePlottedDataForExpectedValue(optimalSimulator)
-
-  // const dataForVarianceSimple = generatePlottedDataForVariance(simpleSimulator)
-  // const dataForVarianceOptimal = generatePlottedDataForVariance(optimalSimulator)
 
   const dataForCompareInequalityForSimple = generatePlottedDataForComparingInequality(simpleSimulator)
   const dataForCompareInequalityForOptimal = generatePlottedDataForComparingInequality(optimalSimulator)
@@ -18,12 +12,14 @@ export const ChartsApp = ()=> {
 
         {/* 総和のプロット */}
         <SummationChart />
+        {/* simpleSimulatorの不等式のプロット */}
         <Chart 
           data={dataForCompareInequalityForSimple}
           xAxisTitle={"Time"}
           yAxisTitle={"Value"}
           title={"Compare tightness of inequalities"}
         />
+        {/* エントロピー生成最小の時の不等式のプロット */}
         <Chart 
           data={dataForCompareInequalityForOptimal}
           xAxisTitle={"Time"}
@@ -34,6 +30,7 @@ export const ChartsApp = ()=> {
   );
 }
 
+/** 実際のエントロピー生成、Path Lengthによる下限、Wasserstein距離による下限のプロットをするためのChart */
 const Chart = (props:{
   data:PlottedData[],
   title:string,
@@ -127,7 +124,7 @@ type PlottedData = {
   "lowerBoundByDistance": number,
 }
 
-
+/** Wasserstein距離によってエントロピー生成を推定する際に用いる時間間隔を大きくして行った時の精度の低下を見るためのChart */
 const SummationChart = () => {
   const rawData = generatePlottedDataForComparingSummuation(simpleSimulator)
   const plottedData:Data[] = []

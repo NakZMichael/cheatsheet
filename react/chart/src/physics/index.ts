@@ -1,5 +1,9 @@
 /**
- * 時間発展の計算に必要な値、これだけでエントロピー生成も計算できる
+ * ひとまず計算に使うデータや関数の型を作成する。
+ */
+
+/**
+ * 時間発展の計算に必要な値、またエントロピー生成を計算するのに必要
  * @field variance 分散
  * @field expectedValue 分布の中心
  */
@@ -71,11 +75,15 @@ type SimulatorFunction = () => {
 
 
 
-
+/**
+ * KFunctionの具体例(他に作るのも面倒なのでシミュレーションにはこれを使っている)
+ */
 const simpleKFunction:KFunction = (props)=>{
-  // return 3 * 1.38064852 * Math.pow(10,-2)
   return props.kbT*( 2 + Math.sin(props.time ))
 }
+/**
+ * PotentialCenterFunctionの具体例(他に作るのも面倒なのでシミュレーションにはこれを使っている)
+ */
 const simplePotentialCenterFunction:PotentialCenterFunction = (props)=>{
   return 10 * Math.sin(props.time )
 }
@@ -83,7 +91,9 @@ const simplePotentialCenterFunction:PotentialCenterFunction = (props)=>{
 
 
 
-
+/**
+ * Runge-Kuttaの実装
+ */
 const calculateDefferenceWithRungeKuttaFunction:CalculateDefferenceWithRungeKuttaFunction = (props)=>{
   const {timeStep,time,prevValue,changeRateFunction} = props
   
@@ -106,6 +116,9 @@ const calculateDefferenceWithRungeKuttaFunction:CalculateDefferenceWithRungeKutt
   return ( k1 + 2*k2 + 2*k3 + k4 )/6
 }
 
+/**
+ * シミュレーションを行うのに必要な情報を全部持たせてあるクラス
+ */
 export class Simulator{
   // 時刻の終端と時間間隔を定義
   maxTime:number
@@ -217,6 +230,9 @@ export class Simulator{
 }
 
 
+/**
+ * simpleKFunctionとsimplePotentialCenterFunctionを用いて作成したシミュレーター
+ */
 export const simpleSimulator = new Simulator({
   // 時刻の終端と時間間隔を定義
   maxTime:3141.59,
@@ -231,6 +247,9 @@ export const simpleSimulator = new Simulator({
   potentialCenterFunction : simplePotentialCenterFunction,
 })
 
+/**
+ * simpleSimulatorと始点と終点を一致させた時にエントロピー生成を最小にするプロトコルを実現した時のシミュレーター
+ */
 export const optimalSimulator = new Simulator({
   // 時刻の終端と時間間隔を定義
   maxTime:10,
@@ -242,16 +261,16 @@ export const optimalSimulator = new Simulator({
   kFunction : simpleKFunction,
   potentialCenterFunction : simplePotentialCenterFunction,
 })
-
 const res = optimalSimulator.execute()
 optimalSimulator.expectedValueChangeRateFunction = (props)=> res[res.length -1].observable.expectedValue / optimalSimulator.maxTime
 optimalSimulator.varianceChangeRateFunction = (props)=> 2 * Math.sqrt(props.currentVariance) * ( (
   Math.sqrt(res[res.length -1].observable.variance) - Math.sqrt(res[0].observable.variance)
   )/ optimalSimulator.maxTime )
 
-
+/**
+ * 実際のエントロピー生成、Path Lengthによる下限、Wasserstein距離による下限の大小関係をプロットするためのデータを生成する。
+ */
 export function generatePlottedDataForComparingInequality(simulator:Simulator){
-  // mobilityConstantとkbTは引数にするようにした方が良さそう
   const mobilityConstant = simulator.mobilityConstant
   const kbT = simulator.kbT
   const simulatedData = simulator.execute()
@@ -311,6 +330,9 @@ export function generatePlottedDataForComparingInequality(simulator:Simulator){
   })
 }
 
+/**
+ * Wasserstein距離によってエントロピー生成を推定する際に用いる時間間隔を大きくして行った時の精度の低下をシミュレーションするためのデータを生成する。
+ */
 export function generatePlottedDataForComparingSummuation(simulator:Simulator){
   // mobilityConstantとkbTは引数にするようにした方が良さそう
   const mobilityConstant = simulator.mobilityConstant

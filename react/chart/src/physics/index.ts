@@ -1,9 +1,13 @@
 /**
- * 時間発展の計算に必要な値、これだけでエントロピー生成も計算できる
+ * ひとまず計算に使うデータや関数の型を作成する。
+ */
+
+/**
+ * 時間発展の計算に必要な値、またエントロピー生成を計算するのに必要
  * @field variance 分散
  * @field expectedValue 分布の中心
  */
-type PhysicalObservable = {
+ type PhysicalObservable = {
   variance: number
   expectedValue: number
 }
@@ -16,11 +20,17 @@ type PhysicalObservable = {
 /**
  * バネ定数kの従う式
  */
-type KFunction = (time:number)=>number
+type KFunction = (props:{
+  time:number,
+  kbT:number,
+})=>number
 /**
  * ポテンシャルの中心aの従う式
  */
-type PotentialCenterFunction = (time:number)=>number
+type PotentialCenterFunction = (props:{
+  time:number,
+  kbT:number,
+})=>number
 /**
  * 分布の中心の期待値の変化率を計算する式
  */
@@ -65,19 +75,25 @@ type SimulatorFunction = () => {
 
 
 
-
-const simpleKFunction:KFunction = (time:number)=>{
-  // return 3 * 1.38064852 * Math.pow(10,-2)
-  return 3 * 1.38064852 * Math.pow(10,-21) +  Math.pow(10,-5) * (1 + time)
+/**
+ * KFunctionの具体例(他に作るのも面倒なのでシミュレーションにはこれを使っている)
+ */
+const simpleKFunction:KFunction = (props)=>{
+  return props.kbT*( 2 + Math.sin(props.time ))
 }
-const simplePotentialCenterFunction:PotentialCenterFunction = (time:number)=>{
-  return Math.pow(10,-8) * Math.sin(time)
+/**
+ * PotentialCenterFunctionの具体例(他に作るのも面倒なのでシミュレーションにはこれを使っている)
+ */
+const simplePotentialCenterFunction:PotentialCenterFunction = (props)=>{
+  return 10 * Math.sin(props.time )
 }
 
 
 
 
-
+/**
+ * Runge-Kuttaの実装
+ */
 const calculateDefferenceWithRungeKuttaFunction:CalculateDefferenceWithRungeKuttaFunction = (props)=>{
   const {timeStep,time,prevValue,changeRateFunction} = props
   
@@ -100,6 +116,9 @@ const calculateDefferenceWithRungeKuttaFunction:CalculateDefferenceWithRungeKutt
   return ( k1 + 2*k2 + 2*k3 + k4 )/6
 }
 
+/**
+ * シミュレーションを行うのに必要な情報を全部持たせてあるクラス
+ */
 export class Simulator{
   // 時刻の終端と時間間隔を定義
   maxTime:number
@@ -136,14 +155,14 @@ export class Simulator{
    */
   expectedValueChangeRateFunction:ExpectedValueChangeRateFunction = (props)=>{
     const {currentExpectedValue,time,kFunction,potentialCenterFunction} = props
-    return this.mobilityConstant * kFunction(time) * ( potentialCenterFunction(time) - currentExpectedValue )
+    return this.mobilityConstant * kFunction({time,kbT:this.kbT}) * ( potentialCenterFunction({time,kbT:this.kbT}) - currentExpectedValue )
   }
   /**
    * 分散の変化率を求める
    */
   varianceChangeRateFunction:VarianceChangeRateFunction = (props)=>{
     const {currentVariance,time,kFunction} = props
-    return 2 * this.mobilityConstant * ( this.kbT - kFunction(time) * currentVariance )
+    return 2 * this.mobilityConstant * ( this.kbT - kFunction({time,kbT:this.kbT}) * currentVariance )
   }
 
   public execute:SimulatorFunction = ()=>{
@@ -160,7 +179,7 @@ export class Simulator{
       // 物理量は初期状態で並行状態になるようにしておく
       observable:{
         expectedValue:0,
-        variance:this.kbT/this.kFunction(0)
+        variance:this.kbT/this.kFunction({time:0,kbT:this.kbT})
       }
     })
 
@@ -211,38 +230,47 @@ export class Simulator{
 }
 
 
+/**
+ * simpleKFunctionとsimplePotentialCenterFunctionを用いて作成したシミュレーター
+ */
 export const simpleSimulator = new Simulator({
   // 時刻の終端と時間間隔を定義
-  maxTime:10,
+  maxTime:3141.59,
   timeStep :0.01,
   // 物理定数の類はここで定義
-  mobilityConstant:1400,
+  mobilityConstant:1,
   // const temperature = 300
   // const boltzmannConstant = 1.38064852 * Math.pow(10,-23) //こいつ計算精度に影響与えそうだからよしなに処理した方がいいかも
-  kbT:3 * 1.38064852 * Math.pow(10,-21),　//こいつ計算精度に影響与えそうだからよしなに処理した方がいいかも
+  kbT:0.01,　//こいつ計算精度に影響与えそうだからよしなに処理した方がいいかも
   
   kFunction : simpleKFunction,
   potentialCenterFunction : simplePotentialCenterFunction,
 })
 
+/**
+ * simpleSimulatorと始点と終点を一致させた時にエントロピー生成を最小にするプロトコルを実現した時のシミュレーター
+ */
 export const optimalSimulator = new Simulator({
   // 時刻の終端と時間間隔を定義
   maxTime:10,
   timeStep :0.01,
   // 物理定数の類はここで定義
-  mobilityConstant:1400,
-  kbT:3 * 1.38064852 * Math.pow(10,-21),　//こいつ計算精度に影響与えそうだからよしなに処理した方がいいかも
+  mobilityConstant:10,
+  kbT:0.01,　//こいつ計算精度に影響与えそうだからよしなに処理した方がいいかも
   
   kFunction : simpleKFunction,
   potentialCenterFunction : simplePotentialCenterFunction,
 })
+const res = optimalSimulator.execute()
+optimalSimulator.expectedValueChangeRateFunction = (props)=> res[res.length -1].observable.expectedValue / optimalSimulator.maxTime
+optimalSimulator.varianceChangeRateFunction = (props)=> 2 * Math.sqrt(props.currentVariance) * ( (
+  Math.sqrt(res[res.length -1].observable.variance) - Math.sqrt(res[0].observable.variance)
+  )/ optimalSimulator.maxTime )
 
-optimalSimulator.expectedValueChangeRateFunction = (props)=>Math.pow(10,-10) *1.5
-optimalSimulator.varianceChangeRateFunction = (props)=> - Math.sqrt(props.currentVariance) *  Math.pow(10,-9)
-
-
+/**
+ * 実際のエントロピー生成、Path Lengthによる下限、Wasserstein距離による下限の大小関係をプロットするためのデータを生成する。
+ */
 export function generatePlottedDataForComparingInequality(simulator:Simulator){
-  // mobilityConstantとkbTは引数にするようにした方が良さそう
   const mobilityConstant = simulator.mobilityConstant
   const kbT = simulator.kbT
   const simulatedData = simulator.execute()
@@ -295,13 +323,16 @@ export function generatePlottedDataForComparingInequality(simulator:Simulator){
   return intermediateData.map(value=>{
     return {
       time:value.time,
-      entropyProduction:value.entropyProduction,
-      lowerBoundByPathLength: (value.pathLength)**2 / ( mobilityConstant * kbT * (value.time) ),
-      lowerBoundByDistance: (value.distance)**2 / ( mobilityConstant * kbT * (value.time) ),
+      "entropyProduction":value.entropyProduction,
+      "lowerBoundByPathLength": (value.pathLength)**2 / ( mobilityConstant * kbT * (value.time) ),
+      "lowerBoundByDistance": (value.distance)**2 / ( mobilityConstant * kbT * (value.time) ),
     }
   })
 }
 
+/**
+ * Wasserstein距離によってエントロピー生成を推定する際に用いる時間間隔を大きくして行った時の精度の低下をシミュレーションするためのデータを生成する。
+ */
 export function generatePlottedDataForComparingSummuation(simulator:Simulator){
   // mobilityConstantとkbTは引数にするようにした方が良さそう
   const mobilityConstant = simulator.mobilityConstant
@@ -312,7 +343,8 @@ export function generatePlottedDataForComparingSummuation(simulator:Simulator){
     timeStep:number,
     value:number
   }[] = []
-  for (let interval=1;interval<=500;interval++){
+
+  for (let interval=1;interval<=1000;interval++){
     const dataForOneTimeStep:{
       time:number,
       summuation:number,
@@ -325,22 +357,22 @@ export function generatePlottedDataForComparingSummuation(simulator:Simulator){
         })
         return
       }
-      if(index%interval !== 0){
-        return 
+      if(index%interval === 0){
+        // intervalごとに
+        // 時間的に粗視化したエントロピー生成を計算
+        const entropyProductionDifference = (
+          (simulatedData[index].observable.expectedValue - simulatedData[index-interval].observable.expectedValue)**2
+          +
+          (Math.sqrt(simulatedData[index].observable.variance) - Math.sqrt(simulatedData[index-interval].observable.variance))**2
+        ) / (
+          mobilityConstant * kbT * ((simulatedData[index].time - simulatedData[index-interval].time))
+        )
+        
+        dataForOneTimeStep.push({
+          time:value.time,
+          summuation:entropyProductionDifference + dataForOneTimeStep[dataForOneTimeStep.length -1].summuation,
+        })
       }
-      // 時間的に粗視化したエントロピー生成を計算
-      const entropyProductionDifference = (
-        (simulatedData[index].observable.expectedValue - simulatedData[index-interval].observable.expectedValue)**2
-        +
-        (Math.sqrt(simulatedData[index].observable.variance) - Math.sqrt(simulatedData[index-interval].observable.variance))**2
-      ) / (
-        mobilityConstant * kbT * ((simulatedData[index].time - simulatedData[index-interval].time))
-      )
-      
-      dataForOneTimeStep.push({
-        time:value.time,
-        summuation:entropyProductionDifference + dataForOneTimeStep[dataForOneTimeStep.length -1].summuation,
-      })
       if (index === simulatedData.length -1){
         result.push(
           {

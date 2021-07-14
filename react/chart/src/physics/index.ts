@@ -235,12 +235,10 @@ export class Simulator{
  */
 export const simpleSimulator = new Simulator({
   // 時刻の終端と時間間隔を定義
-  maxTime:3141.59,
+  maxTime:10,
   timeStep :0.01,
   // 物理定数の類はここで定義
   mobilityConstant:1,
-  // const temperature = 300
-  // const boltzmannConstant = 1.38064852 * Math.pow(10,-23) //こいつ計算精度に影響与えそうだからよしなに処理した方がいいかも
   kbT:0.01,　//こいつ計算精度に影響与えそうだからよしなに処理した方がいいかも
   
   kFunction : simpleKFunction,

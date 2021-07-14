@@ -1,46 +1,51 @@
-# Getting Started with Create React App
+## 環境構築
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+npmをインストールする。
 
-## Available Scripts
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+```
 
-In the project directory, you can run:
+必要があれば`~/.zshrc`に以下の行を追加してください。
 
-### `yarn start`
+```
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+その後`nvm install 16`とすれば最新版のnpmがインストールされます。
+このアプリケーションではnpmの代わりにyarnを使用しているので
+コマンドラインで
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```
+npm i -g yarn
+```
 
-### `yarn test`
+を実行してください。
+その後、このディレクトリに移動した後、コマンドラインで以下のコマンドを実行すれば必要なパッケージがインストールされます。
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+yarn
+```
 
-### `yarn build`
+これで環境構築は完了です。
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 実行方法
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+コマンドラインで以下のコマンドを入力してください。
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+yarn start
+```
 
-### `yarn eject`
+初回の起動には少し時間がかかりますが、その後はコードの変更を自動で検知してブラウザに反映してくれます。
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## ディレクトリ構成
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+物理関係のコードは全て`./src/physics/index.ts`に置かれています。
+プロット関係のコードは全て`./src/pages/charts/index.tsx`に置かれています。
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+シミュレーションの変数などを変更する場合は
+`./src/pages/charts/index.tsx`内の
+`simpleSimulator`,`optimalSimulator`,`simpleKFunction`,`simplePotentialCenterFunction`などを変更してください。
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

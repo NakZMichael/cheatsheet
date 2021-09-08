@@ -71,12 +71,3 @@ stashとは、ファイルの変更内容を一時的に記録しておく領域
 
 - `git add (ファイル名)`でファイルもしくはフォルダをgit管理に追加することができる。`git add .`で全ての変更をstageすることができる。
 
-## hoge
-
-## fuga
-## fuga
-## fuga
-## fuga
-## fuga
-## fuga
-## fuga

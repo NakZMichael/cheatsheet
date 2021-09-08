@@ -118,6 +118,7 @@ resetでは、要らなくなったコミットを捨てることができます
 ## revert(既に公開したコミットを安全に打ち消す)
 
 - `git revert (取り消したいコミット)`で取り消したいコミットを打ち消すコミットが作成される。
+- 特に直前のコミットを打ち消したい場合は`git revert HEAD`
 
 ## cherry-pick
 
@@ -165,6 +166,8 @@ git merge FETCH_HEAD
 - `git tag -a (タグ名)`でコミットにタグをつけることができる。
 
 ## commit --amend(直前のコミットを修正する)
+
+`git add`で必要な変更をstagingした後、`git commit --amend`で先ほど`git add`した変更を取り込みつつ前回のコミットを修正することができる。
 
 主な利用シーン
 

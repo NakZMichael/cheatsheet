@@ -46,6 +46,12 @@
         "jestConfig": "apps/api/jest.config.js",
         "passWithNoTests": true
       }
+    },
+    "open-api-generate": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "bash apps/api/tools/open-api-generator/generate.sh"
+      }
     }
   },
   "tags": []

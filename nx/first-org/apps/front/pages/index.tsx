@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import {Todo} from '@first-org/data'
+import {Todo,TodoApi,Configuration} from '@first-org/data'
 import { Todos } from '@first-org/ui';
+
 
 const StyledPage = styled.div`
   .todo{
@@ -9,24 +10,29 @@ const StyledPage = styled.div`
   }
 `;
 
+const todoApi = new TodoApi(new Configuration({
+  basePath:'/api',
+}))
+
 export function Index() {
   const [todos, setTodos] = useState<Todo[]>([]);
 
   useEffect(() => {
-    fetch('/api/todo')
-      .then((_) => _.json())
-      .then(setTodos);
+    todoApi.todoControllerFindAll().then((res)=>{
+      const fetchedTodos = res.data;
+      setTodos(fetchedTodos)
+    })
   }, []);
 
   function addTodo() {
-    fetch('/api/todo', {
-      method: 'POST',
-      body: '',
+    todoApi.todoControllerAddPost({
+      createTodoDto:{
+        title: `TODO: ${Math.floor(Math.random() * 1000)}`
+      }
+    }).then(res=>{
+      const addedTodo = res.data;
+      setTodos((prev)=>[...prev,addedTodo])
     })
-      .then((_) => _.json())
-      .then((newTodo) => {
-        setTodos([...todos, newTodo]);
-      });
   }
   return (
     <StyledPage>

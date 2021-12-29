@@ -19,7 +19,7 @@ export function Todos(props: TodosProps) {
           key={`todos-${t.id}`}
           className={'todo'}
         >
-          {t.title}
+          {t.title}!!
         </li>
       ))}
     </ul>

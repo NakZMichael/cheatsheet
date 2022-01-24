@@ -1,0 +1,14 @@
+{
+  "name": "photo-share-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start":"nodemon -e js,json,graphql"
+  },
+  "dependencies": {
+    "apollo-server": "^3.6.2",
+    "graphql": "^16.2.0",
+    "nodemon": "^2.0.15"
+  }
+}

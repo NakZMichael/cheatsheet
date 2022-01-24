@@ -17,7 +17,7 @@ export const SelectedItemCard = (props: SelectedItemCardProps) => {
   } = props;
   const { watch } = formMethods;
   const item = watch(`items.${itemIndex}`);
-  const { fields: toppingIds, append: appendToppingIds } = useFieldArray({
+  const { fields: toppings, append: appendToppingIds } = useFieldArray({
     control: formMethods.control,
     name: `items.${itemIndex}.toppings`,
   });
@@ -42,7 +42,7 @@ export const SelectedItemCard = (props: SelectedItemCardProps) => {
         <Typography>{item.item.name}</Typography>
         <Typography>{`個数: ${item.count}`}</Typography>
         <Typography>トッピング</Typography>
-        {toppingIds.map((toppingId, toppingIndex) => {
+        {toppings.map((toppingId, toppingIndex) => {
           const topping = allToppings.find((top) => top.id === toppingId.id);
           return (
             <div key={toppingId.id}>

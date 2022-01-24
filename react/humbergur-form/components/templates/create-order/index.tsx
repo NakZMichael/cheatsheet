@@ -66,7 +66,7 @@ export const CreateOrderTemplate = () => {
               <div key={selectedItem.id}>
                 <SelectedItemCard
                   formMethods={formMethods}
-                  index={selectedItemIndex}
+                  itemIndex={selectedItemIndex}
                 />
               </div>
             ))

@@ -12,7 +12,7 @@
     "express": "^4.17.2",
     "graphql": "^16.2.0",
     "graphql-playground-middleware-express": "^1.7.23",
-    "mongodb": "^4.3.1",
+    "mongodb": "3.1.0",
     "nodemon": "^2.0.15"
   }
 }
